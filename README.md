@@ -1,1 +1,1 @@
-# clips-smart-contract
+# claim-soulbound-smart-contract

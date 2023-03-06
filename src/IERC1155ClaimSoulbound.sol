@@ -7,7 +7,7 @@ pragma solidity ^0.8.0;
 /**
  * Lazy Claim interface
  */
-interface IERC1155ClaimTip {
+interface IERC1155ClaimSoulbound {
     enum StorageProtocol { INVALID, NONE, ARWEAVE, IPFS }
 
     struct ClaimParameters {
@@ -39,6 +39,27 @@ interface IERC1155ClaimTip {
     event ClaimInitialized(address indexed creatorContract, uint256 indexed claimIndex, address initializer);
     event ClaimTipMint(address indexed creatorContract, uint256 indexed claimIndex, uint indexed cost);
     event ClaimTipMintBatch(address indexed creatorContract, uint256 indexed claimIndex, uint16 mintCount, uint indexed cost);
+
+    /**
+     * @notice Set whether or not the creator will check the extension for approval of token transfer
+     * @param creatorContractAddress    the creator contract the claim will mint tokens for
+     * @param enabled                   true if we want creator to check the extension for approval of token transfer
+     */
+    function setApproveTransfer(address creatorContractAddress, bool enabled) external;
+
+    /**
+     * @notice Called by creator contract to approve a transfer
+     * @param from                      the address of the sender
+     * @param to                        the address of the receiver
+     */
+    function approveTransfer(address, address from, address to, uint256[] calldata, uint256[] calldata) external;
+
+    /**
+     * @notice Called by creator contract to approve a transfer (v1)
+     * @param from                      the address of the sender
+     * @param to                        the address of the receiver
+     */
+    function approveTransfer(address from, address to, uint256[] calldata, uint256[] calldata) external;
 
     /**
      * @notice initialize a new claim, emit initialize event, and return the newly created index
@@ -130,4 +151,9 @@ interface IERC1155ClaimTip {
      * @param amounts                   number of tokens to airdrop to each address in addresses
      */
     function airdrop(address creatorContractAddress, uint256 claimIndex, address[] calldata recipients, uint256[] calldata amounts) external;
+
+    /**
+     * @notice Withdraw funds
+     */
+    function withdraw(address payable receiver, uint256 amount) external;
 }
