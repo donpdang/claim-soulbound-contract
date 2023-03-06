@@ -2,61 +2,17 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "../src/ERC1155ClaimTip.sol";
+import "../src/ERC1155ClaimSoulbound.sol";
 import {Utils} from "./utils/Utils.sol";
 import {ERC1155Creator} from "@manifoldxyz/creator-core-solidity/contracts/ERC1155Creator.sol";
+import "./ERC1155SetUp.t.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
-
-
-contract ERC1155ClaimTipTest is Test {
-    Utils internal utils;
-    address payable[] internal users;
-    ERC1155ClaimTip public lazyClaim;
-    address internal owner;
-    address internal creator;
-    address internal minter;
-    ERC1155Creator public creatorContract;
+contract ERC1155ClaimSoulboundTest is Test, ERC1155SetUp {
     uint256 private constant DEV_FEE = 0.00069 ether;
 
-    function setUp() public {
-        utils = new Utils();
-        users = utils.createUsers(3);
-        owner = 0xCD56df7B4705A99eBEBE2216e350638a1582bEC4;
-        vm.label(owner, "Owner");
-        creator = users[1];
-        vm.label(creator, "Creator");
-        minter = users[2];
-        vm.label(minter, "Minter");
-
-        // dev deploy the clip extension contract
-        vm.startPrank(owner);
-        lazyClaim = new ERC1155ClaimTip(0x00000000000076A84feF008CDAbe6409d2FE638B);
-        vm.stopPrank();
-
-        // creator deploying the creator contract
-        vm.startPrank(creator);
-        creatorContract = new ERC1155Creator("test","TEST");
-        creatorContract.registerExtension(address(lazyClaim), "");
-        vm.stopPrank();
-    }
-
     function testTippingMint() public {
-       vm.startPrank(creator);
-       IERC1155ClaimTip.ClaimParameters memory claimParameters = IERC1155ClaimTip.ClaimParameters( {
-          merkleRoot: bytes32(0x0000000000000000000000000000000000000000000000000000000000000000),
-          location: "arweaveHash2",
-          totalMax: 0,
-          walletMax: 0,
-          startDate: 0,
-          endDate: 0,
-          storageProtocol: IERC1155ClaimTip.StorageProtocol.ARWEAVE,
-          cost: 1e17,
-          paymentReceiver: payable(creator)
-        });
-        // initialize claim
-        lazyClaim.initializeClaim(address(creatorContract), 1,claimParameters);
-        vm.stopPrank();
-
+        this.initalizeWithMockClaim();
         bytes32[] memory merkleProof = new bytes32[](1);
         uint beforeBalanceCreator = creator.balance;
         uint beforeBalanceContract = address(lazyClaim).balance;
@@ -82,21 +38,7 @@ contract ERC1155ClaimTipTest is Test {
     }
 
     function testTippingMintBatch() public {
-       vm.startPrank(creator);
-       IERC1155ClaimTip.ClaimParameters memory claimParameters = IERC1155ClaimTip.ClaimParameters( {
-          merkleRoot: bytes32(0x0000000000000000000000000000000000000000000000000000000000000000),
-          location: "arweaveHash2",
-          totalMax: 0,
-          walletMax: 0,
-          startDate: 0,
-          endDate: 0,
-          storageProtocol: IERC1155ClaimTip.StorageProtocol.ARWEAVE,
-          cost: 1e17,
-          paymentReceiver: payable(creator)
-        });
-        // initialize claim
-        lazyClaim.initializeClaim(address(creatorContract), 1,claimParameters);
-        vm.stopPrank();
+        this.initalizeWithMockClaim();
 
         uint beforeBalanceCreator = creator.balance;
         uint beforeBalanceContract = address(lazyClaim).balance;
@@ -125,20 +67,7 @@ contract ERC1155ClaimTipTest is Test {
 
 
     function testNotEnoughEthMintBatch() public {
-        vm.startPrank(creator);
-       IERC1155ClaimTip.ClaimParameters memory claimParameters = IERC1155ClaimTip.ClaimParameters( {
-          merkleRoot: bytes32(0x0000000000000000000000000000000000000000000000000000000000000000),
-          location: "arweaveHash2",
-          totalMax: 0,
-          walletMax: 0,
-          startDate: 0,
-          endDate: 0,
-          storageProtocol: IERC1155ClaimTip.StorageProtocol.ARWEAVE,
-          cost: 1e17,
-          paymentReceiver: payable(creator)
-        });
-        // initialize claim
-        lazyClaim.initializeClaim(address(creatorContract), 1,claimParameters);
+        this.initalizeWithMockClaim();
         vm.stopPrank();
         vm.startPrank(minter);
         // able to pay the right price
@@ -149,22 +78,8 @@ contract ERC1155ClaimTipTest is Test {
         vm.stopPrank();
     }
 
-        function testNotEnoughEthMint() public {
-        vm.startPrank(creator);
-       IERC1155ClaimTip.ClaimParameters memory claimParameters = IERC1155ClaimTip.ClaimParameters( {
-          merkleRoot: bytes32(0x0000000000000000000000000000000000000000000000000000000000000000),
-          location: "arweaveHash2",
-          totalMax: 0,
-          walletMax: 0,
-          startDate: 0,
-          endDate: 0,
-          storageProtocol: IERC1155ClaimTip.StorageProtocol.ARWEAVE,
-          cost: 1e17,
-          paymentReceiver: payable(creator)
-        });
-        // initialize claim
-        lazyClaim.initializeClaim(address(creatorContract), 1,claimParameters);
-        vm.stopPrank();
+    function testNotEnoughEthMint() public {
+        this.initalizeWithMockClaim();
 
         bytes32[] memory merkleProof = new bytes32[](1);
         vm.startPrank(minter);
@@ -176,21 +91,7 @@ contract ERC1155ClaimTipTest is Test {
 
     function testWithdraw() public {
         // test if the owner of the extension will receive the fund
-        vm.startPrank(creator);
-       IERC1155ClaimTip.ClaimParameters memory claimParameters = IERC1155ClaimTip.ClaimParameters( {
-          merkleRoot: bytes32(0x0000000000000000000000000000000000000000000000000000000000000000),
-          location: "arweaveHash2",
-          totalMax: 0,
-          walletMax: 0,
-          startDate: 0,
-          endDate: 0,
-          storageProtocol: IERC1155ClaimTip.StorageProtocol.ARWEAVE,
-          cost: 1e17,
-          paymentReceiver: payable(creator)
-        });
-        // initialize claim
-        lazyClaim.initializeClaim(address(creatorContract), 1,claimParameters);
-        vm.stopPrank();
+        this.initalizeWithMockClaim();
 
         bytes32[] memory merkleProof = new bytes32[](1);
 
@@ -207,7 +108,7 @@ contract ERC1155ClaimTipTest is Test {
         vm.stopPrank();
 
         vm.startPrank(owner);      
-        lazyClaim.withdraw();
+        lazyClaim.withdraw(payable(owner), DEV_FEE);
         assertEq(DEV_FEE, owner.balance);
         vm.stopPrank();
 
@@ -220,21 +121,41 @@ contract ERC1155ClaimTipTest is Test {
         
         uint ownerBeforeBalance = owner.balance;
         vm.startPrank(owner);      
-        lazyClaim.withdraw();
+        lazyClaim.withdraw(payable(owner), DEV_FEE*2);
         assertEq(DEV_FEE*2, owner.balance - ownerBeforeBalance);
         vm.stopPrank();
     }
 
     function testCannotWithdrawIfNotOwner() public {
-        vm.expectRevert('Wallet is not an administrator for contract');
+        vm.expectRevert('AdminControl: Must be owner or admin');
         vm.startPrank(creator);
-        lazyClaim.withdraw();
+        lazyClaim.withdraw(payable(owner), DEV_FEE);
         vm.stopPrank();
         
-        vm.expectRevert('Wallet is not an administrator for contract');
+        vm.expectRevert('AdminControl: Must be owner or admin');
         vm.startPrank(minter);
-        lazyClaim.withdraw();
+        lazyClaim.withdraw(payable(owner), DEV_FEE);
         vm.stopPrank();
     }
 
+    function testCannotTransferToken() public {
+        this.initalizeWithMockClaim();
+        vm.startPrank(minter);
+        bytes32[] memory merkleProof = new bytes32[](1);
+        lazyClaim.mint{value: 1e17 + DEV_FEE}(address(creatorContract), 1, 0, merkleProof, address(minter));
+        // should not be able to transfer minted token
+        bytes memory data = new bytes(1);
+        vm.expectRevert('Extension approval failure');
+        creatorContract.safeTransferFrom(address(minter), address(minter2), 1, 1, data);
+    }
+
+    function testCanBurnToken() public {
+        this.initalizeWithMockClaim();
+        vm.startPrank(minter);
+        bytes32[] memory merkleProof = new bytes32[](1);
+        lazyClaim.mint{value: 1e17 + DEV_FEE}(address(creatorContract), 1, 0, merkleProof, address(minter));
+        uint256[] memory tempArray = new uint256[](1);
+        tempArray[0] = 1;
+        creatorContract.burn(address(minter), tempArray, tempArray);
+    }
 }

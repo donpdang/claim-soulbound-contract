@@ -41,27 +41,6 @@ interface IERC1155ClaimSoulbound {
     event ClaimTipMintBatch(address indexed creatorContract, uint256 indexed claimIndex, uint16 mintCount, uint indexed cost);
 
     /**
-     * @notice Set whether or not the creator will check the extension for approval of token transfer
-     * @param creatorContractAddress    the creator contract the claim will mint tokens for
-     * @param enabled                   true if we want creator to check the extension for approval of token transfer
-     */
-    function setApproveTransfer(address creatorContractAddress, bool enabled) external;
-
-    /**
-     * @notice Called by creator contract to approve a transfer
-     * @param from                      the address of the sender
-     * @param to                        the address of the receiver
-     */
-    function approveTransfer(address, address from, address to, uint256[] calldata, uint256[] calldata) external;
-
-    /**
-     * @notice Called by creator contract to approve a transfer (v1)
-     * @param from                      the address of the sender
-     * @param to                        the address of the receiver
-     */
-    function approveTransfer(address from, address to, uint256[] calldata, uint256[] calldata) external;
-
-    /**
      * @notice initialize a new claim, emit initialize event, and return the newly created index
      * @param creatorContractAddress    the creator contract the claim will mint tokens for
      * @param claimIndex                the index of the claim in the list of creatorContractAddress' _claims

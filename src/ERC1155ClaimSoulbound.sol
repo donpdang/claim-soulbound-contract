@@ -21,7 +21,7 @@ import "./IDelegationRegistry.sol";
  * @author nobodiesdev
  * @notice Lazy claim with optional whitelist ERC1155 tokens
  */
-contract ERC1155ClaimSoulbound is IERC165, IERC1155ClaimSoulbound, ICreatorExtensionTokenURI, IERC1155CreatorExtensionApproveTransfer, ReentrancyGuard {
+contract ERC1155ClaimSoulbound is IERC165, IERC1155ClaimSoulbound, ICreatorExtensionTokenURI, IERC1155CreatorExtensionApproveTransfer, AdminControl, ReentrancyGuard {
     using Strings for uint256;
 
     bytes4 private constant IERC1155CreatorExtensionApproveTransfer_v1 = 0x93a80b14;
@@ -48,8 +48,8 @@ contract ERC1155ClaimSoulbound is IERC165, IERC1155ClaimSoulbound, ICreatorExten
     // { contractAddress => { tokenId => { claimIndex } }
     mapping(address => mapping(uint256 => uint256)) private _claimTokenIds;
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165) returns (bool) {
-        return interfaceId == type(IERC1155ClaimTip).interfaceId ||
+    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, AdminControl) returns (bool) {
+        return interfaceId == type(IERC1155ClaimSoulbound).interfaceId ||
             interfaceId == type(ICreatorExtensionTokenURI).interfaceId ||
             interfaceId == type(IERC1155CreatorExtensionApproveTransfer).interfaceId ||
             interfaceId == IERC1155CreatorExtensionApproveTransfer_v1 ||
@@ -73,7 +73,7 @@ contract ERC1155ClaimSoulbound is IERC165, IERC1155ClaimSoulbound, ICreatorExten
      /**
      * @dev Set whether or not the creator will check the extension for approval of token transfer
      */
-    function setApproveTransfer(address creatorContractAddress, bool enabled) external override creatorAdminRequired(creatorContractAddress) {
+    function setApproveTransfer(address creatorContractAddress, bool enabled) external creatorAdminRequired(creatorContractAddress) {
         require(ERC165Checker.supportsInterface(creatorContractAddress, type(IERC1155CreatorCore).interfaceId), "creator must implement IERC1155CreatorCore");
         IERC1155CreatorCore(creatorContractAddress).setApproveTransferExtension(enabled);
     }
@@ -81,18 +81,18 @@ contract ERC1155ClaimSoulbound is IERC165, IERC1155ClaimSoulbound, ICreatorExten
     /**
      * @dev Called by creator contract to approve a transfer
      */
-    function approveTransfer(address, address from, address to, uint256[] calldata, uint256[] calldata) external override view returns (bool) {
+    function approveTransfer(address, address from, address to, uint256[] calldata, uint256[] calldata) external override pure returns (bool) {
         return _approveTransfer(from, to);
     }
 
     /**
      * @dev Called by creator contract to approve a transfer (v1)
      */
-    function approveTransfer(address from, address to, uint256[] calldata, uint256[] calldata) external override view returns (bool) {
+    function approveTransfer(address from, address to, uint256[] calldata, uint256[] calldata) external override pure returns (bool) {
         return _approveTransfer(from, to);
     }
 
-    function _approveTransfer(address from, address to) private view returns (bool) {
+    function _approveTransfer(address from, address to) private pure returns (bool) {
         if (from == address(0) || to == address(0)) return true;
         return false;
     }
