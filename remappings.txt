@@ -6,4 +6,4 @@ libraries-solidity/=lib/libraries-solidity/contracts/
 openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/
 @openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
 @openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/
-@manifoldxyz/creator-core-solidity/contracts/=lib/creator-core-solidity/contracts/
+@manifoldxyz/creator-core-solidity/contracts/=lib/creator-core-solidity-v2/contracts/
