@@ -5,7 +5,7 @@
 [submodule "lib/creator-core-solidity"]
 	path = lib/creator-core-solidity
 	url = https://github.com/manifoldxyz/creator-core-solidity
-	branch = v2.0.2
+	branch = v1.0.6
 [submodule "lib/libraries-solidity"]
 	path = lib/libraries-solidity
 	url = https://github.com/manifoldxyz/libraries-solidity
