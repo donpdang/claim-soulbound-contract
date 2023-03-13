@@ -38,6 +38,7 @@ contract ERC1155SetUp is Test{
       vm.startPrank(creator);
       creatorContract = new ERC1155Creator();
       creatorContract.registerExtension(address(lazyClaim), "");
+      lazyClaim.setApproveTransfer(address(creatorContract), true);
       vm.stopPrank();
   }
 
