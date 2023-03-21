@@ -81,18 +81,18 @@ contract ERC1155ClaimSoulbound is IERC165, IERC1155ClaimSoulbound, ICreatorExten
     /**
      * @dev Called by creator contract to approve a transfer
      */
-    function approveTransfer(address, address from, address to, uint256[] calldata, uint256[] calldata) external override pure returns (bool) {
-        return _approveTransfer(from, to);
+    function approveTransfer(address, address from, address to, uint256[] calldata tokenIds, uint256[] calldata) external view returns (bool) {
+        return _approveTransfer(from, to, tokenIds);
     }
 
     /**
      * @dev Called by creator contract to approve a transfer (v1)
      */
-    function approveTransfer(address from, address to, uint256[] calldata, uint256[] calldata) external override pure returns (bool) {
-        return _approveTransfer(from, to);
+    function approveTransfer(address from, address to, uint256[] calldata tokenIds, uint256[] calldata) external view returns (bool) {
+        return _approveTransfer(from, to, tokenIds);
     }
 
-    function _approveTransfer(address from, address to) private pure returns (bool) {
+    function _approveTransfer(address from, address to, uint256[] calldata) private view returns (bool) {
         if (from == address(0) || to == address(0)) return true;
         return false;
     }
