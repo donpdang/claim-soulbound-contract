@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 /// @author: nobodiesdev
 
 /**
- * Lazy Claim interface
+ * Lazy Soulbound Claim interface
  */
 interface IERC1155ClaimSoulbound {
     enum StorageProtocol { INVALID, NONE, ARWEAVE, IPFS }
@@ -37,8 +37,8 @@ interface IERC1155ClaimSoulbound {
     }
 
     event ClaimInitialized(address indexed creatorContract, uint256 indexed claimIndex, address initializer);
-    event ClaimTipMint(address indexed creatorContract, uint256 indexed claimIndex, uint indexed cost);
-    event ClaimTipMintBatch(address indexed creatorContract, uint256 indexed claimIndex, uint16 mintCount, uint indexed cost);
+    event ClaimSoulboundMint(address indexed creatorContract, uint256 indexed claimIndex, uint indexed cost);
+    event ClaimSoulboundMintBatch(address indexed creatorContract, uint256 indexed claimIndex, uint16 mintCount, uint indexed cost);
 
     /**
      * @notice initialize a new claim, emit initialize event, and return the newly created index

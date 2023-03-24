@@ -17,9 +17,9 @@ import "./IERC1155ClaimSoulbound.sol";
 import "./IDelegationRegistry.sol";
 
 /**
- * @title Lazy Payable Claim
+ * @title Lazy Payable Soulbound Claim
  * @author nobodiesdev
- * @notice Lazy claim with optional whitelist ERC1155 tokens
+ * @notice Lazy soulbound claim with optional whitelist ERC1155 tokens
  */
 contract ERC1155ClaimSoulbound is IERC165, IERC1155ClaimSoulbound, ICreatorExtensionTokenURI, IERC1155CreatorExtensionApproveTransfer, AdminControl, ReentrancyGuard {
     using Strings for uint256;
@@ -272,7 +272,7 @@ contract ERC1155ClaimSoulbound is IERC165, IERC1155ClaimSoulbound, ICreatorExten
         (bool sentToCreator, ) = claim.paymentReceiver.call{value: msg.value - DEV_FEE}("");
         require(sentToCreator, "Failed to transfer to receiver");
 
-        emit ClaimTipMint(creatorContractAddress, claimIndex, claim.cost);
+        emit ClaimSoulboundMint(creatorContractAddress, claimIndex, claim.cost);
     }
 
     /**
@@ -322,7 +322,7 @@ contract ERC1155ClaimSoulbound is IERC165, IERC1155ClaimSoulbound, ICreatorExten
         (bool sentToCreator, ) = claim.paymentReceiver.call{value: msg.value - (DEV_FEE * mintCount)}("");
         require(sentToCreator, "Failed to transfer to receiver");
  
-        emit ClaimTipMintBatch(creatorContractAddress, claimIndex, mintCount, claim.cost);
+        emit ClaimSoulboundMintBatch(creatorContractAddress, claimIndex, mintCount, claim.cost);
     }
 
     /**
