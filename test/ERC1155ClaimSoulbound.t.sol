@@ -4,7 +4,6 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import "../src/ERC1155ClaimSoulbound.sol";
 import {Utils} from "./utils/Utils.sol";
-import {ERC1155Creator} from "@manifoldxyz/creator-core-solidity/contracts/ERC1155Creator.sol";
 import "./ERC1155SetUp.t.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
